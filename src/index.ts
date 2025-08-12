@@ -12,8 +12,6 @@ const ProcessSchema = z.object({
   env: z.record(z.string()).optional(),
 });
 const ConfigSchema = z.object({
-  team: z.string().optional(),
-  project: z.string().optional(),
   envPrefix: z.string().default("env"),
   startIndex: z.number().int().min(1).default(1),
   count: z.number().int().min(1).default(1),
@@ -33,22 +31,10 @@ const ConfigSchema = z.object({
       extra: z.record(z.string()).default({}),
     })
     .default({}),
-  convex: z
-    .object({
-      configureOnCreate: z.boolean().default(false),
-    })
-    .default({}),
   workspace: z
     .object({
       includeInstallTask: z.boolean().default(false),
       generate: z.boolean().default(true),
-    })
-    .default({}),
-  vite: z
-    .object({
-      basePort: z.number().int().default(5173),
-      hostPattern: z.string().default("${name}.localhost"),
-      strictPort: z.boolean().default(true),
     })
     .default({}),
   worktree: z
@@ -96,18 +82,7 @@ async function ensureInstall(dir: string, cmd: string) {
   }
 }
 
-async function headlessConvexConfigureOnce(dir: string, team?: string, project?: string) {
-  if (!team || !project) return;
-  await execa(
-    "bash",
-    [
-      "-lc",
-      // Keep available for opt-in only. This intentionally provisions using Convex defaults.
-      `pnpm dlx convex dev --once --configure existing --team ${team} --project ${project}`,
-    ],
-    { cwd: dir, stdio: "inherit" },
-  );
-}
+// No framework-specific setup; users can drive any tools via processes.
 
 async function generateWorkspace(
   repo: string,
@@ -129,7 +104,6 @@ async function generateWorkspace(
     }
 
     for (const p of cfg.processes) {
-      const strict = cfg.vite?.strictPort ? " --strictPort" : "";
       const baseVars = {
         repo,
         name: env.name,
@@ -138,7 +112,6 @@ async function generateWorkspace(
         dir: env.dir,
         port: env.port,
         host: env.host,
-        strict,
         ...cfg.variables.extra,
       } as Record<string, string | number | boolean>;
       const command = render(p.command, baseVars);
@@ -227,10 +200,10 @@ program
       const name = `${prefix}${index}`;
       const branch = render(cfg.worktree.branchPattern, { name, index });
       const dir = path.resolve(render(cfg.worktree.basePath, { repo, name, index }));
-      const basePort = cfg.variables?.port?.start ?? cfg.vite?.basePort ?? 5173;
+      const basePort = cfg.variables?.port?.start ?? 5173;
       const step = cfg.variables?.port?.step ?? 1;
       const port = basePort + i * step;
-      const hostPattern = cfg.variables?.host?.pattern ?? cfg.vite?.hostPattern ?? "localhost";
+      const hostPattern = cfg.variables?.host?.pattern ?? "localhost";
       const host = render(hostPattern, { name, index });
       return { name, index, branch, dir, port, host };
     });
@@ -238,9 +211,6 @@ program
     for (const env of envs) {
       await ensureWorktree(env);
       await ensureInstall(env.dir, cfg.ensureInstall);
-      if (cfg.convex.configureOnCreate) {
-        await headlessConvexConfigureOnce(env.dir, cfg.team, cfg.project);
-      }
     }
 
     await generateWorkspace(repo, envs, cfg);
