@@ -16,6 +16,11 @@ const ConfigSchema = z.object({
   envPrefix: z.string().default("env"),
   startIndex: z.number().int().min(1).default(1),
   count: z.number().int().min(1).default(1),
+  convex: z
+    .object({
+      configureOnCreate: z.boolean().default(false),
+    })
+    .default({}),
   vite: z
     .object({
       basePort: z.number().int().default(5173),
@@ -69,10 +74,15 @@ async function ensureInstall(dir: string, cmd: string) {
 
 async function headlessConvexConfigureOnce(dir: string, team?: string, project?: string) {
   if (!team || !project) return;
-  await execa("bash", [
-    "-lc",
-    `pnpm dlx convex dev --once --configure existing --team ${team} --project ${project} --dev-deployment cloud`,
-  ], { cwd: dir, stdio: "inherit" });
+  await execa(
+    "bash",
+    [
+      "-lc",
+      // Keep available for opt-in only. This intentionally provisions using Convex defaults.
+      `pnpm dlx convex dev --once --configure existing --team ${team} --project ${project}`,
+    ],
+    { cwd: dir, stdio: "inherit" },
+  );
 }
 
 async function generateWorkspace(
@@ -177,7 +187,9 @@ program
     for (const env of envs) {
       await ensureWorktree(env);
       await ensureInstall(env.dir, cfg.ensureInstall);
-      await headlessConvexConfigureOnce(env.dir, cfg.team, cfg.project);
+      if (cfg.convex.configureOnCreate) {
+        await headlessConvexConfigureOnce(env.dir, cfg.team, cfg.project);
+      }
     }
 
     await generateWorkspace(repo, envs, cfg);

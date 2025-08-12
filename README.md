@@ -51,6 +51,9 @@ pnpm dlx worktree-fleet fleet create --count 3 --prefix agent
   "envPrefix": "agent",
   "startIndex": 1,
   "count": 3,
+  "convex": {
+    "configureOnCreate": false
+  },
   "vite": {
     "basePort": 5173,
     "hostPattern": "${name}.localhost",
@@ -76,7 +79,8 @@ pnpm dlx worktree-fleet fleet create --count 3 --prefix agent
 }
 ```
 
-- Set `team` and `project` to skip Convex prompts and write `.env.local` once.
+- Set `team` and `project` if you want the tool to be able to provision via Convex later.
+- `convex.configureOnCreate: false` means Convex provisioning is deferred; run it from workspace tasks instead.
 - Ports will be `basePort`, `basePort+1`, …; hosts use `hostPattern` (e.g. `agent1.localhost`).
 
 2) From the project root, run the CLI:
