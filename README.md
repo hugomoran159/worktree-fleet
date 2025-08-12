@@ -1,4 +1,4 @@
-## panels-dev-env (pde)
+## worktree-fleet (fleet)
 
 Small CLI to spin up multiple isolated local environments for a single repo using Git worktrees. It creates branches like `agent1`, `agent2`, …; installs dependencies if missing; optionally performs a headless Convex configuration; and generates a VS Code multi-root workspace with tasks to run everything.
 
@@ -25,19 +25,19 @@ You can run the CLI without publishing to npm.
 
 ```bash
 # from your project repo root
-node ../panels-dev-env/dist/index.js pde create --count 3 --prefix agent
+node ../worktree-fleet/dist/index.js fleet create --count 3 --prefix agent
 ```
 
 ### Option B. Run directly from GitHub via pnpm dlx (no publish)
 
 ```bash
-pnpm dlx github:<your-gh-user>/panels-dev-env pde create --count 3 --prefix agent
+pnpm dlx github:<your-gh-user>/worktree-fleet fleet create --count 3 --prefix agent
 ```
 
 ### Option C. After publishing to npm
 
 ```bash
-pnpm dlx panels-dev-env pde create --count 3 --prefix agent
+pnpm dlx worktree-fleet fleet create --count 3 --prefix agent
 ```
 
 ## Quickstart
@@ -83,10 +83,10 @@ pnpm dlx panels-dev-env pde create --count 3 --prefix agent
 
 ```bash
 # local build
-node ../panels-dev-env/dist/index.js create --count 3 --prefix agent
+node ../worktree-fleet/dist/index.js fleet create --count 3 --prefix agent
 
 # or via GitHub
-pnpm dlx github:<your-gh-user>/panels-dev-env pde create --count 3 --prefix agent
+pnpm dlx github:<your-gh-user>/worktree-fleet fleet create --count 3 --prefix agent
 ```
 
 3) Open the generated workspace file `<repo>-worktrees.code-workspace` in VS Code and run:
@@ -97,7 +97,7 @@ You’ll get N watchers/processes across the environments. Vite can bind to uniq
 
 ## Commands
 
-### `pde create`
+### `fleet create`
 
 Creates `count` environments using Git worktrees, ensures dependencies, optionally configures Convex, and writes a VS Code workspace with tasks.
 
@@ -114,7 +114,7 @@ Behavior per env:
 4. If `team` and `project` are set → `pnpm dlx convex dev --once --configure existing ...` to generate `.env.local`
 5. Update `<repo>-worktrees.code-workspace` with per-env tasks and compounds
 
-### `pde destroy`
+### `fleet destroy`
 
 Removes the most recent N environments created by `create` and deletes their branches.
 
@@ -188,7 +188,7 @@ The CLI writes `<repo>-worktrees.code-workspace` with:
 Prepare one environment for tests without watchers:
 
 ```bash
-pde create --count 1 --prefix ci
+fleet create --count 1 --prefix ci
 # run your tests pointing at the created worktree path
 ```
 
@@ -211,7 +211,7 @@ Optionally add a GitHub remote and push:
 
 ```bash
 git branch -M main
-git remote add origin git@github.com:<your-gh-user>/panels-dev-env.git
+git remote add origin git@github.com:<your-gh-user>/worktree-fleet.git
 git push -u origin main
 ```
 

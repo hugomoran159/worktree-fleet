@@ -1,16 +1,28 @@
 {
-  "name": "panels-dev-env",
-  "version": "0.1.0",
+  "name": "worktree-fleet",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "bin": {
+    "fleet": "dist/index.js",
     "pde": "dist/index.js"
   },
   "scripts": {
     "dev": "tsx src/index.ts",
-    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "build": "tsup src/index.ts --format esm,cjs --dts --banner.cjs '#!/usr/bin/env node' --banner.js '#!/usr/bin/env node'",
+    "prepare": "pnpm run build",
     "lint": "biome check ."
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hugomoran159/panels-dev-env.git"
+  },
+  "homepage": "https://github.com/hugomoran159/panels-dev-env#readme",
+  "license": "MIT",
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^12.1.0",

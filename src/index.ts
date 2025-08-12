@@ -152,7 +152,7 @@ async function generateWorkspace(
 }
 
 const program = new Command();
-program.name("pde").description("Panels dev environments (worktree orchestrator)").version("0.1.0");
+program.name("fleet").description("Worktree fleet orchestrator").version("0.1.0");
 
 program
   .command("create")
