@@ -21,6 +21,11 @@ const ConfigSchema = z.object({
       configureOnCreate: z.boolean().default(false),
     })
     .default({}),
+  workspace: z
+    .object({
+      includeInstallTask: z.boolean().default(false),
+    })
+    .default({}),
   vite: z
     .object({
       basePort: z.number().int().default(5173),
@@ -94,13 +99,15 @@ async function generateWorkspace(
   const compounds: any[] = [];
 
   for (const env of envs) {
-    tasks.push({
-      label: `setup:ensure install ${env.name}`,
-      type: "shell",
-      command: `[ -d node_modules ] && echo '${env.name} deps already installed' || ${cfg.ensureInstall}`,
-      options: { cwd: env.dir },
-      problemMatcher: [],
-    });
+    if (cfg.workspace.includeInstallTask) {
+      tasks.push({
+        label: `setup:ensure install ${env.name}`,
+        type: "shell",
+        command: `[ -d node_modules ] && echo '${env.name} deps already installed' || ${cfg.ensureInstall}`,
+        options: { cwd: env.dir },
+        problemMatcher: [],
+      });
+    }
 
     for (const p of cfg.processes) {
       const strict = cfg.vite.strictPort ? " --strictPort" : "";
@@ -120,7 +127,7 @@ async function generateWorkspace(
       type: "shell",
       command: `echo starting ${env.name}...`,
       dependsOn: [
-        `setup:ensure install ${env.name}`,
+        ...(cfg.workspace.includeInstallTask ? [`setup:ensure install ${env.name}`] : []),
         ...cfg.processes.map((p) => `${env.name}:${p.label}`),
       ],
       dependsOrder: "sequence",
@@ -130,7 +137,7 @@ async function generateWorkspace(
     compounds.push({
       label: `${env.name}:all`,
       dependsOn: [
-        `setup:ensure install ${env.name}`,
+        ...(cfg.workspace.includeInstallTask ? [`setup:ensure install ${env.name}`] : []),
         ...cfg.processes.map((p) => `${env.name}:${p.label}`),
       ],
       dependsOrder: "sequence",
