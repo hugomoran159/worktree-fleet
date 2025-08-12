@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "tsx src/index.ts",
-    "build": "tsup src/index.ts --format esm,cjs --dts --banner.cjs '#!/usr/bin/env node' --banner.js '#!/usr/bin/env node'",
+    "build": "tsup src/index.ts --format esm,cjs --dts --onSuccess 'node scripts/add-shebang.mjs'",
     "prepare": "pnpm run build",
     "lint": "biome check ."
   },
@@ -19,9 +19,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hugomoran159/panels-dev-env.git"
+    "url": "git+https://github.com/hugomoran159/worktree-fleet.git"
   },
-  "homepage": "https://github.com/hugomoran159/panels-dev-env#readme",
+  "homepage": "https://github.com/hugomoran159/worktree-fleet#readme",
   "license": "MIT",
   "dependencies": {
     "chalk": "^5.3.0",

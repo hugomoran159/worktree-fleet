@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 "use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
@@ -150,7 +151,7 @@ async function generateWorkspace(repo, envs, cfg) {
   console.log(`Wrote ${wsFile}`);
 }
 var program = new import_commander.Command();
-program.name("pde").description("Panels dev environments (worktree orchestrator)").version("0.1.0");
+program.name("fleet").description("Worktree fleet orchestrator").version("0.1.0");
 program.command("create").option("--count <n>", "number of envs", (v) => parseInt(v, 10)).option("--prefix <str>", "name prefix").action(async (opts) => {
   const cfg = await loadConfig();
   const repo = await getRepoName();
